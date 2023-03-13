@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Notify } from 'notiflix';
-import simpleLightbox from 'simplelightbox';
+import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const refs = {
@@ -8,19 +8,35 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   loadBtn: document.querySelector('.load-more'),
 };
-const lightbox = new simpleLightbox('.gallery a', {});
+
 let currentPage = 1;
 
-refs.form.addEventListener('submit', onFormSubmit);
+refs.form.addEventListener('submit', loadPicures);
+refs.loadBtn.addEventListener('click', loadPicures);
 
-async function onFormSubmit(e) {
+async function loadPicures(e) {
   e.preventDefault();
 
   const query = refs.form.elements.searchQuery.value;
 
   const searchResult = await getPictures(query);
-  const markup = await createMarkup(searchResult);
-  insertMarkup(markup);
+
+  if (!searchResult.length) {
+    Notify.info(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  }
+  if (e.type === 'submit') {
+    clearMarkup();
+  }
+  currentPage += 1;
+  if (searchResult) {
+    const markup = await createMarkup(searchResult);
+    insertMarkup(markup);
+    const lightbox = new SimpleLightbox('.gallery a');
+  }
+
   console.log(searchResult);
 }
 
@@ -40,7 +56,7 @@ async function createMarkup(array) {
       `
   <a href="${item.largeImageURL}" class="gallery__item">
         <div class="photo-card">
-          <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" />
+          <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" class="gallery__image"/>
           <div class="info">
             <p class="info-item">
               <b>Likes: ${item.likes}</b>
@@ -64,4 +80,10 @@ async function createMarkup(array) {
 
 function insertMarkup(data) {
   refs.gallery.insertAdjacentHTML('beforeend', data);
+}
+
+async function loadMorePictures() {}
+
+function clearMarkup() {
+  refs.gallery.innerHTML = '';
 }
