@@ -20,7 +20,14 @@ async function loadPicures(e) {
   //відміна перезавантаження сторінки при сабміті
   e.preventDefault();
   //збір введеного значення
-  const query = refs.form.elements.searchQuery.value;
+  const query = refs.form.elements.searchQuery.value.trim();
+
+  if (!query) {
+    Notify.info(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  }
   //отримання результатів пошуку картинок, формат об'єкту з властивостями total, totalHits, hits
   const searchResult = await getPictures(query);
   //перевірка на пустий об'єкт
@@ -46,14 +53,16 @@ async function loadPicures(e) {
     //вставка розмітки
     insertMarkup(markup);
     //плавне прокручування
-    const { height: cardHeight } = document
-      .querySelector('.gallery')
-      .firstElementChild.getBoundingClientRect();
+    if (e.type === 'click') {
+      const { height: cardHeight } = document
+        .querySelector('.gallery')
+        .firstElementChild.getBoundingClientRect();
 
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+    }
     //ініціалізація лайтбокса
     const lightbox = new SimpleLightbox('.gallery a');
     //робить кнопку підвантаження картинок видимою
@@ -71,13 +80,16 @@ async function loadPicures(e) {
 async function getPictures(query) {
   const KEY = '34375479-0be71e9ee085bc26f1477b7fd';
   const url = `https://pixabay.com/api/?key=${KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${currentPage}&per_page=40`;
-
-  const res = await axios.get(url);
-  console.log(res.data);
-  return res.data;
+  try {
+    const res = await axios.get(url);
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
 }
 //створення розмітки
-async function createMarkup(array) {
+function createMarkup(array) {
   return array.reduce(
     (acc, item) =>
       acc +
