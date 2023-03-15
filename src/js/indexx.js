@@ -49,7 +49,7 @@ async function loadPicures(e) {
   //перевірка, що прийшов масив
   if (searchResult.hits) {
     //генерація розмітки
-    const markup = await createMarkup(searchResult.hits);
+    const markup = createMarkup(searchResult.hits);
     //вставка розмітки
     insertMarkup(markup);
     //плавне прокручування
@@ -124,4 +124,5 @@ function insertMarkup(data) {
 //очищення розмітки
 function clearMarkup() {
   refs.gallery.innerHTML = '';
+  currentPage = 1;
 }
