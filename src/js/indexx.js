@@ -40,12 +40,12 @@ async function loadPicures(e) {
   }
   //перевірка події, якщо сабміт - очистити розмітку
   if (e.type === 'submit') {
+    currentPage = 1;
     clearMarkup();
     //повідомлення про загальну кількість знайдених картинок
     Notify.info(`Hooray! We found ${searchResult.totalHits} images.`);
   }
-  //збільшення значення поточної сторінки
-  currentPage += 1;
+
   //перевірка, що прийшов масив
   if (searchResult.hits) {
     //генерація розмітки
@@ -67,6 +67,8 @@ async function loadPicures(e) {
     const lightbox = new SimpleLightbox('.gallery a');
     //робить кнопку підвантаження картинок видимою
     refs.loadBtn.classList.remove('hide');
+    //збільшення значення поточної сторінки
+    currentPage += 1;
 
     lightbox.refresh();
   }
@@ -124,5 +126,4 @@ function insertMarkup(data) {
 //очищення розмітки
 function clearMarkup() {
   refs.gallery.innerHTML = '';
-  currentPage = 1;
 }
